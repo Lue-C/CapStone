@@ -1,3 +1,38 @@
+inspiration# Machine Learning for a Mechanical ventilator
+## Overview
+this project is a [Kaggle challenge](https://www.kaggle.com/competitions/ventilator-pressure-prediction) and it aims to develop a ML model to predict the lung pressure in a Mechanical ventilator.  <br>
+
+In times of the global pandemic caused by COVID19, medical services experience an exceeding workload caused by the large number of patients in the hospitals. A significant part of these patients needs mechanical ventilation systems (MVS) occupying additional trained medical personnel. These specially trained people need to adjust the lung pressure on the MVS manually to ensure optimal oxygen supply. At the same time they need to prevent severe lung damage due to high pressure. <br> 
+Also developing new methods for controlling mechanical ventilators is prohibitively expensive, even before reaching clinical trials. High-quality simulators could reduce this barrier. Current simulators are trained as an ensemble, where each model simulates a single lung setting. However, lungs and their attributes form a continuous space, so a parametric approach must be explored that would consider the differences in patient lungs.  <br>
+
+A fully automatic MVS would reduce the workload of the medical staff and enable better care for other patients. For the adaptive and automatic mode of operation of such a device, machine learning (ML) methods are required. Our project aims to predict the lung pressure based on different lung attributes using various ML approaches. In that way, important parameters of the MVS can be assessed that help to build a superior software that assist to find an pressure output for the individual patient. By combining flexible models with time series elements, we are able to make predictions with high precision.
+
+## Stakeholder info
+Our stakeholder is People's Ventilator project(PVP), a project funded by Princeton University, as a team at Google Brain aims to grow the community around machine learning for mechanical ventilation control. They believe that neural networks and deep learning can better generalize across lungs with varying characteristics than the current industry standard of PID controllers. They cameup with a mechanical ventilator which can be build in 3 das by a single person in 3 days and it only costs around 1300$. If we compare it with the current existing ventilators (cost more than 10000 $), these are far more affordable. At the end their aim is to make it available for different health sectors!
+
+## Data Structure
+We were given different breaths corrsponding to different lung settings and the task was to predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs. Basic data structure looks like: <br> 
+time_step : 80 timesteps corresponding to a breath <br> 
+u_in : Inputflow which correspond to the amount of air that is flowing into the lungs <br> 
+u_out : Indicator variable which tells whether the expiratory valve is open or not. If open, denoted by 0 and if closed (inspiration), denoted by  0 (exspiration) <br> 
+R (Resistance) : Thickness of the inspiratory valve and how it correspond to the input flow <br>
+C (Compliance) : Flexibility of the lungs and how it corresponds to the input flow <br>
+Pressure : Target variable. Lung pressure during inspiration.
+
+Apart from this basic features, we calculated additional feature doing feature engineering for eg: different air volumns and Time shifted features.
+
+## Evaluation metrics
+It is very important for us to predict the target variable, ie pressure very accurately. Because, if it is too low, the patient won't get enough oxygen and if it is too high, it can cause lung damage. Hence we need to have a measure of error corresponding to the pressure. In this case, we choose 
+Mean Square Error (MAE) as our metric since it can give us the mean deviation of our prediction from the actual values of the target variable verywell, in our case pressure. MAE is too sensitive to lower and higher values of pressure
+
+## Baseline model
+We choose our baseline model to be a linear regression with polynomial function (degree 2) on our basic features (Input flow, output flow, R and C). 
+Results are shown in the notebook: [baseline_model.ipynb](https://github.com/Lue-C/CapStone/blob/main/models/baseline_model.ipynb). This model gave us an MAE of 3.38 cmH2o and t clearly showed that our model is not enough to cope with very different pressure profiles. So we needed more complex models
+
+## Machine Learning models
+We started with simple ML models and XGBoost and Artificial Neural Network(ANN) gave us promising result in the initial stages. But then we realised that this problem can be 
+treated as a Auto regression (AR) problem since the pressure values at a given time highly depends on the pressure values at the previous time steps. Hence we calculated AR features out of given features (Pressure and Input flow) by time shifting them. We used these features along with feature engineed ones in XGBoost and ANN. As we imagines, the results were promising and ANN gave us the best results sofar with an MAE of 0.15 ([ANN.ipynb](https://github.com/Lue-C/CapStone/blob/main/models/ANN.ipynb))
+
 # ds-modeling-pipeline
 
 Here you find a Skeleton project for building a simple model in a python script or notebook and log the results on MLFlow.
